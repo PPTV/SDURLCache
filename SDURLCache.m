@@ -767,10 +767,12 @@ static dispatch_queue_t get_disk_io_queue() {
 
 - (void)removeAllCachedResponses {
     [super removeAllCachedResponses];
-    NSFileManager *fileManager = [[NSFileManager alloc] init];
-    [fileManager removeItemAtPath:_diskCachePath error:NULL];
-    dispatch_async_afreentrant(get_disk_cache_queue(), ^{
-        self.diskCacheInfo = nil;
+    dispatch_async_afreentrant(get_disk_io_queue(), ^{
+        NSFileManager *fileManager = [[NSFileManager alloc] init];
+        [fileManager removeItemAtPath:_diskCachePath error:NULL];
+        dispatch_async_afreentrant(get_disk_cache_queue(), ^{
+            self.diskCacheInfo = nil;
+        });
     });
 }
 
